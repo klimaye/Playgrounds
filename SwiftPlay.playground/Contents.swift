@@ -135,8 +135,9 @@ let atleast5chars:String -> Bool = {
     item in
     return count(item) >= 5
 }
+let atleast5chars2:String -> Bool = { count($0) >= 10 }
 
-let result = bind(bind(names, longest),atleast5chars)
+let result = bind(bind(names, longest),atleast5chars2)
 
 println("\(result)")
 
@@ -158,5 +159,100 @@ println(square)
 
 var avg = averageOfFunction(3, 4, { $0 * $0 })
 println(avg)
-println(averageOfFunction(3, 4, { $0*$0*$0}))
+avg = averageOfFunction(3, 4, { $0*$0*$0})
+println(avg)
 
+let evens = Array(1...10).filter({ $0 % 2 == 0})
+println(evens)
+
+extension Array {
+func myFilter<T>(predicate:(T) -> Bool) -> [T] {
+    var result = [T]()
+    for i in self {
+        let element = i as! T
+        if predicate(element) {
+            result.append(element)
+        }
+    }
+    return result
+}
+}
+let odds = Array(1...10).myFilter({ $0 % 2 == 1})
+println(odds)
+
+var evenSum = Array(1...10)
+    .filter({ $0 % 2 == 0})
+    .reduce(0, combine: { (total,item) in total + item })
+println(evenSum)
+
+var evenString = Array(1...10)
+    .filter( { $0 % 2 == 0})
+    .reduce("numbers: ", combine: { (str,item) in str + "\(item)" })
+
+println(evenString)
+
+let contacted:Int! = ["3","1","4","1"]
+.reduce("", combine: {(result, item) in result + "\(item)" }).toInt()
+println(contacted)
+
+let mult = 0
+let contacted2:Int! =
+["3", "1", "4", "1"]
+    .reduce(0, combine: {(result, item) in
+        (result * 10) + item.toInt()!
+    })
+
+println(contacted2) //3141
+
+let words = ["Cat", "Chicken", "fish", "Dog",
+    "Mouse", "Guinea Pig", "monkey"]
+
+typealias Entry = (Character, [String])
+
+func firstCharacter(word:String) -> Character {
+    return Character(
+        word.substringToIndex(
+            word.startIndex.successor()
+        ).uppercaseString
+    )
+}
+
+func distinct(words:[Character]) -> [Character] {
+    var result = [Character]()
+    for item in words {
+        if (!contains(result, item)) {
+            result.append(item)
+        }
+    }
+    return result
+}
+
+func buildIndex(words:[String]) -> [Entry] {
+    let characters = words.map({ firstCharacter($0)}).sorted({ $0 < $1 })
+    let distinctChars = distinct(characters)
+    return distinctChars.map {
+        (letter) -> Entry in
+        var matches = words.filter({
+            firstCharacter($0) == letter
+        })
+        return (letter,matches)
+    }
+}
+
+println(buildIndex(words))
+
+
+//custom operator fun
+infix operator |> { associativity left}
+public func |> <T,U>(array:[T],
+    operation:T -> U) -> [U] {
+        return array.map(operation)
+}
+let output =
+words
+    |> { $0.uppercaseString }
+    |> { firstCharacter($0) }
+
+println("******")
+println(output)
+println("******")
